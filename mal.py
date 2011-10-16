@@ -24,7 +24,7 @@ class Window(QtGui.QWidget):
     self.setGeometry(100, 100, 300, 600)
     self.setWindowTitle("lol")
 
-#    self.layout = QtGui.QBoxLayout(QtGui.QBoxLayout.Direction(1), self)
+    self.layout = QtGui.QAbstractScrollArea(self)
 
     self.box = QtGui.QBoxLayout(QtGui.QBoxLayout.Direction(2), self)
 
