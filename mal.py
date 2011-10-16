@@ -1,8 +1,25 @@
 import sys
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-import feedparser, urllib
 
+try:
+  from PyQt4 import QtGui
+  from PyQt4 import QtCore
+except:
+  print("PyQt4 module missing!")
+  sys.exit(-1)
+
+try:
+  import feedparser
+except:
+  print("feedparser module missing!")
+  sys.exit(-1)
+
+try:
+  import urllib
+except:
+  print("urrlib module missing!")
+  sys.exit(-1)
+
+from actions import * 
 
 ######### Search Engines ########
 ## return title, torrent, info ##
@@ -76,6 +93,7 @@ class Window(QtGui.QWidget):
 
   def selected(self, i):
     msg = QtGui.QMessageBox()
+    msg.setWindowTitle("Torrent Selected!")
     msg.setIcon(1) # X Error (?)
     msg.setText(i.title)
     msg.setDetailedText("Torrent: {}\n\nInfo: {}".format(i.torrent, i.div))
@@ -83,15 +101,17 @@ class Window(QtGui.QWidget):
     msg.addButton("Download!", 0)
     
     if msg.exec_() == 1:
-      print("ACTION!")
+      # Add to actions.py the method you want to call when "download" is selected
+      download(i)
 
 
 def main():
-  app = QtGui.QApplication()
+  app = QtGui.QApplication(sys.argv)
   w = Window()
   w.show()
   w.textedit.setText("no horizon")
   sys.exit(app.exec_())
 
-main()
+if __name__ == '__main__':
+  main()
 
