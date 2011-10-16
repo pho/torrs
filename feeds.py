@@ -9,6 +9,7 @@ class NyaaSearcher():
 
     offset = 1
     f = feedparser.parse(urllib.request.urlopen('http://www.nyaa.eu/?page=rss&term={0}&offset={1}'.format(term, offset)))
+    print(f['items'])
     while len(f['items']) > 0:
       for item in f['items']:
         yield item['title'], item['link']
