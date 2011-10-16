@@ -6,16 +6,15 @@ import urllib
 class NyaaSearcher():
   def search(self, term):
     print("Searching nyaa.eu for {}".format(term))
+
     offset = 1
-    results = []
     f = feedparser.parse(urllib.request.urlopen('http://www.nyaa.eu/?page=rss&term={0}&offset={1}'.format(term, offset)))
     while len(f['items']) > 0:
       for item in f['items']:
-        results.append(item['title'])
+        yield item['title'], item['link']
       offset += 1
       f = feedparser.parse(urllib.request.urlopen('http://www.nyaa.eu/?page=rss&term={0}&offset={1}'.format(term, offset)))
 
-    return results
 
 sources = {
     'inshuheki' : 'http://www.nyaa.eu/?page=rss&user=84109',
@@ -44,7 +43,8 @@ series.append(Serie('Horizon', editores=['inshuheki', 'noone']))
 #    print(item['title'])
 #    print(item['link'])
 
-n = NyaaSearcher()
-for a in n.search('inshuheki'):
-  print(a)
+if __name__ == '__main__':
+  n = NyaaSearcher()
+  for a in n.search('inshuheki'):
+    print(a)
 

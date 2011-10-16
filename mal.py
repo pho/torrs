@@ -4,44 +4,56 @@ from PyQt4 import QtGui
 from PyQt4 import QtCore
 
 
-class Item(QtGui.QFrame):
-  def __init__(self):
-    super(Item, self).__init__()
-    self.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Raised)
+from feeds import NyaaSearcher
 
-    layout = QtGui.QHBoxLayout(self)
-    
-    layout.addWidget(QtGui.QRadioButton("Yeah"))
-    layout.addWidget(QtGui.QPushButton("Add"))
-
-class ItemList(QtGui.QListWidget):
-  def __init__(self):
+class ItemList(QtGui.QListWidgetItem):
+  def __init__(self, title, torrent):
     super(ItemList, self).__init__()
+    self.title = title
+    self.torrent = torrent
+
+    self.setText(title)
+    self.setToolTip(torrent)
+
+
 
 class Window(QtGui.QWidget):
   def __init__(self):
     super(Window, self).__init__()
-    self.setGeometry(100, 100, 300, 600)
+    self.setGeometry(100, 100, 600, 600)
     self.setWindowTitle("lol")
 
-    self.layout = QtGui.QAbstractScrollArea(self)
+    self.textedit = QtGui.QLineEdit()
+    self.buscador = QtGui.QComboBox()
+    self.botonBuscar = QtGui.QPushButton("Q")
+    self.botonBuscar.clicked.connect(self.buscar)
 
-    self.box = QtGui.QBoxLayout(QtGui.QBoxLayout.Direction(2), self.layout)
+    header = QtGui.QHBoxLayout()
+    header.addWidget(self.textedit)
+    header.addWidget(self.buscador)
+    header.addWidget(self.botonBuscar)
 
-    self.box.addWidget(Item())
-    self.box.addWidget(Item())
-    self.box.addWidget(Item())
-    self.box.addWidget(Item())
-    self.box.addWidget(Item())
-    self.box.addStretch()
+    self.lista = QtGui.QListWidget(self)
+    self.lista.itemClicked.connect(self.selected)
 
-    self.addButton = QtGui.QPushButton("Add button!")
-    self.addButton.clicked.connect(self.add)
+    box = QtGui.QVBoxLayout()
+    box.addLayout(header)
+    box.addWidget(self.lista)
 
+    self.setLayout(box)
 
   def add(self):
     print("Click!")
     self.box.addWidget(Item())
+
+  def buscar(self):
+    self.lista.clear()
+    n = NyaaSearcher()
+    for i,t in n.search(self.textedit.text()):
+      self.lista.addItem(ItemList(i, t))
+
+  def selected(self, i):
+    print(i.torrent)
 
 
 def main():
