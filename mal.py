@@ -1,8 +1,27 @@
 import sys
-from time import sleep
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 import feedparser, urllib
+
+
+######### Search Engines ########
+## return title, torrent, info ##
+
+def Nyaa(term):
+    #print("Searching nyaa.eu for {}".format(term))
+    offset = 1
+    f = feedparser.parse(urllib.request.urlopen('http://www.nyaa.eu/?page=rss&term={0}&offset={1}'.format(term, offset)))
+    while len(f['items']) > 0:
+      for item in f['items']:
+        yield item['title'], item['link'], item['summary']
+      offset += 1
+      f = feedparser.parse(urllib.request.urlopen('http://www.nyaa.eu/?page=rss&term={0}&offset={1}'.format(term, offset)))
+
+## Add engine here
+
+sources = { 'nyaa.eu' : Nyaa , 'frozen-layer' :  Nyaa }
+
+############################ GUI
 
 class ItemList(QtGui.QListWidgetItem):
   def __init__(self, title, torrent, div):
@@ -14,19 +33,9 @@ class ItemList(QtGui.QListWidgetItem):
     self.setText(title)
     self.setToolTip(torrent)
 
-
-def Nyaa(term):
-    print("Searching nyaa.eu for {}".format(term))
-
-    offset = 1
-    f = feedparser.parse(urllib.request.urlopen('http://www.nyaa.eu/?page=rss&term={0}&offset={1}'.format(term, offset)))
-    while len(f['items']) > 0:
-      for item in f['items']:
-        yield item['title'], item['link'], item['summary']
-      offset += 1
-      f = feedparser.parse(urllib.request.urlopen('http://www.nyaa.eu/?page=rss&term={0}&offset={1}'.format(term, offset)))
-
-sources = { 'nyaa.eu' : Nyaa , 'frozen-layer' :  Nyaa }
+    size = self.sizeHint()
+    size.setHeight(25)
+    self.setSizeHint(size)
 
 class Window(QtGui.QWidget):
   def __init__(self):
@@ -47,8 +56,6 @@ class Window(QtGui.QWidget):
     header.addWidget(self.botonBuscar)
 
     self.lista = QtGui.QListWidget(self)
-#    self.lista.setSpacing(15)
-    self.lista.setMinimumHeight(40)
     self.lista.itemClicked.connect(self.selected)
 
     box = QtGui.QVBoxLayout()
@@ -63,22 +70,24 @@ class Window(QtGui.QWidget):
 
   def buscar(self):
     self.lista.clear()
+    self.lista.scrollToTop()
     for i,t,d in sources[self.buscador.currentText()](self.textedit.text()):
       self.lista.addItem(ItemList(i, t, d))
 
   def selected(self, i):
     msg = QtGui.QMessageBox()
-  # msg.setIcon(1) # X Error (?)
+    msg.setIcon(1) # X Error (?)
     msg.setText(i.title)
-    msg.setDetailedText(i.torrent +"\n" + i.div)
+    msg.setDetailedText("Torrent: {}\n\nInfo: {}".format(i.torrent, i.div))
     msg.addButton("Cancel", 1)
     msg.addButton("Download!", 0)
     
-    msg.exec_()
+    if msg.exec_() == 1:
+      print("ACTION!")
 
 
 def main():
-  app = QtGui.QApplication(sys.argv)
+  app = QtGui.QApplication()
   w = Window()
   w.show()
   w.textedit.setText("no horizon")
