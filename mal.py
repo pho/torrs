@@ -26,7 +26,7 @@ class Window(QtGui.QWidget):
 
     self.layout = QtGui.QAbstractScrollArea(self)
 
-    self.box = QtGui.QBoxLayout(QtGui.QBoxLayout.Direction(2), self)
+    self.box = QtGui.QBoxLayout(QtGui.QBoxLayout.Direction(2), self.layout)
 
     self.box.addWidget(Item())
     self.box.addWidget(Item())
