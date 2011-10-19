@@ -19,7 +19,10 @@ except:
   print("urrlib module missing!")
   sys.exit(-1)
 
-from actions import * 
+try:
+  from actions import * 
+except:
+  print("[W] There is no actions defined in actions.py"
 
 ######### Search Engines ########
 ## return title, torrent, info ##
